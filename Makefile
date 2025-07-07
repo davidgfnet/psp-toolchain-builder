@@ -15,7 +15,10 @@ build-sources:
 	@echo "==> Packaging source tarball $(SRC_TARBALL)"
 	@rm -f $(SRC_TARBALL)
 	@./builder.sh download-sources
-	@tar czf $(SRC_TARBALL) Makefile builder.sh packages/ sources/
+	@sed -E "s/^(PSPDEV_GITSHA[[:space:]]*:=).*/\1 $(PSPDEV_GITSHA)/" Makefile > .makefile
+	@tar czf $(SRC_TARBALL) --transform='s|^\.makefile$$|Makefile|' \
+	  .makefile builder.sh packages sources
+	@rm -f .makefile
 
 build-all:
 	@echo "==> Building into $$PSPDEV"
