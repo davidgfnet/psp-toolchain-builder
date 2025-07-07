@@ -1,0 +1,40 @@
+pkgname=expat
+pkgver=2.7.1
+pkgrel=1
+pkgdesc="XML parsing C library"
+arch=('mips')
+url="https://libexpat.github.io/"
+license=('MIT')
+groups=('pspdev-ports')
+depends=('toolchain')
+makedepends=()
+optdepends=()
+source=("https://github.com/libexpat/libexpat/releases/download/R_${pkgver//./_}/expat-${pkgver}.tar.gz")
+sha256sums=('0cce2e6e69b327fc607b8ff264f4b66bdf71ead55a87ffd5f3143f535f15cfa2')
+
+prepare() {
+    cd "$pkgname-${pkgver}"
+    sed -i 's#@prefix@#${PSPDEV}/psp#' expat.pc.in
+    sed -i 's#@exec_prefix@#${prefix}#' expat.pc.in
+    sed -i 's#@libdir@#${prefix}/lib#' expat.pc.in
+    sed -i 's#@includedir@#${prefix}/include#' expat.pc.in
+}
+
+build() {
+    cd "$pkgname-${pkgver}"
+    mkdir -p build
+    cd build
+    cmake -Wno-dev -DCMAKE_C_FLAGS="-DXML_POOR_ENTROPY " -DCMAKE_TOOLCHAIN_FILE=$PSPDEV/psp/share/pspdev.cmake -DCMAKE_INSTALL_PREFIX=${pkgdir}/psp \
+        -DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_DOCS=OFF -DEXPAT_BUILD_TESTS=OFF -DEXPAT_BUILD_TOOLS=OFF \
+        -DEXPAT_SHARED_LIBS=OFF "${XTRA_OPTS[@]}" .. || { exit 1; }
+    make --quiet $MAKEFLAGS || { exit 1; }
+}
+
+package() {
+    cd "$pkgname-${pkgver}/build"
+    make --quiet $MAKEFLAGS install
+
+    mkdir -m 755 -p "$pkgdir/psp/share/licenses/$pkgname"
+    install -m 644 ../COPYING "$pkgdir/psp/share/licenses/$pkgname"
+}
+

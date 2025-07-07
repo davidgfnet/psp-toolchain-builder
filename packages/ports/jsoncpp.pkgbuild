@@ -1,0 +1,37 @@
+pkgname=jsoncpp
+pkgver=1.9.6
+pkgrel=1
+pkgdesc="a C++ library for interacting with JSON"
+arch=('mips')
+depends=('toolchain')
+license=('Unlicense')
+groups=('pspdev-ports')
+url="https://github.com/open-source-parsers/jsoncpp"
+makedepends=()
+source=("git+https://github.com/open-source-parsers/jsoncpp#commit=89e2973c754a9c02a49974d839779b151e95afd6")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "$pkgname"
+    sed -i 's#@CMAKE_INSTALL_PREFIX@#${PSPDEV}/psp#g' pkg-config/jsoncpp.pc.in
+    sed -i 's#@libdir_for_pc_file@#${prefix}/lib#' pkg-config/jsoncpp.pc.in
+    sed -i 's#@includedir_for_pc_file@#${prefix}/include#' pkg-config/jsoncpp.pc.in
+}
+
+build() {
+  cd $pkgname
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_TOOLCHAIN_FILE=$PSPDEV/psp/share/pspdev.cmake -DCMAKE_INSTALL_PREFIX=${pkgdir}/psp -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_BUILD_TYPE=Release -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF -DJSONCPP_WITH_TESTS=OFF -DBUILD_OBJECT_LIBS=OFF "${XTRA_OPTS[@]}" .. || { exit 1; }
+  make --quiet $MAKEFLAGS || { exit 1; }
+}
+
+package () {
+  cd "$pkgname/build"
+  make --quiet $MAKEFLAGS install
+  cd ..
+
+  mkdir -m 755 -p "$pkgdir/psp/share/licenses/$pkgname"
+  install -m 644 LICENSE "$pkgdir/psp/share/licenses/$pkgname"
+}

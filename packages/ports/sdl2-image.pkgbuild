@@ -1,0 +1,39 @@
+pkgname=sdl2-image
+pkgver=2.8.6
+pkgrel=6
+pkgdesc="a simple library to load images of various formats as SDL surfaces"
+arch=('mips')
+url="https://wiki.libsdl.org/SDL2_image/FrontPage"
+license=('Zlib')
+groups=('pspdev-ports')
+depends=('sdl2' 'libpng' 'jpeg' 'toolchain')
+makedepends=()
+optdepends=()
+source=(
+    "https://github.com/libsdl-org/SDL_image/releases/download/release-${pkgver}/SDL2_image-${pkgver}.tar.gz"
+)
+sha256sums=(
+    "b71903ef444e6011b7d7751f2cf1bc90994810e199818f2706be62d45b10a848"
+)
+prepare() {
+    cd "${srcdir}/SDL2_image-${pkgver}"
+    sed -i '/^prefix=/s/=.*$/=${PSPDEV}\/psp/' SDL2_image.pc.in
+}
+
+build() {
+    cd "${srcdir}/SDL2_image-${pkgver}"
+    mkdir -p build && cd build
+    cmake -Wno-dev -DCMAKE_TOOLCHAIN_FILE="${PSPDEV}/psp/share/pspdev.cmake" -DCMAKE_INSTALL_PREFIX=/psp \
+        -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=OFF -DSDL2IMAGE_DEPS_SHARED=OFF \
+        -DSDL2IMAGE_INSTALL=ON -DSDL2IMAGE_SAMPLES=OFF -DSDL2IMAGE_BACKEND_STB=OFF -DCMAKE_BUILD_TYPE=Release \
+        "${XTRA_OPTS[@]}" .. || { exit 1; }
+    make --quiet $MAKEFLAGS || { exit 1; }
+}
+
+package() {
+    cd "${srcdir}/SDL2_image-${pkgver}/build"
+    make --quiet DESTDIR="${pkgdir}" ${MAKEFLAGS} install
+
+    mv "${pkgdir}/psp/share/licenses/SDL2_image" "${pkgdir}/psp/share/licenses/${pkgname}"
+}
+

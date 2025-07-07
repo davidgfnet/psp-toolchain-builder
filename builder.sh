@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
+
+PKGBLACKLIST=(
+  "lua51" "lua52" "lua53" "luasocket"      # Only Lua54 is built
+  "tremor"                                 # TODO: Fix packages with issues
+)
 
 # Modes: download-sources, build
 if [ $# -lt 1 ]; then
@@ -16,6 +21,15 @@ SRCDIR=$ROOT/sources
 
 # helper: parse_pkgbuild
 parse_pkgbuild(){
+  unset prepare
+  unset build
+  unset package
+  unset depends
+  unset source
+  unset sha256sums
+  unset url
+  unset license
+
   local file=$1 prefix=$2
   source "$file"
   eval "${prefix}pkgname=\$pkgname"
@@ -65,7 +79,7 @@ if [[ "$MODE" == "download-sources" ]]; then
         mkdir -p "$tgtdir"
 
         echo "==> [$pkgname] cloning $repo"
-        git clone "$repo" "$tgtdir"
+        git clone --recursive "$repo" "$tgtdir"
         echo "==> [$pkgname] checking out $commit"
         git -C "$tgtdir" fetch --all
         git -C "$tgtdir" checkout "$commit"
@@ -75,7 +89,7 @@ if [[ "$MODE" == "download-sources" ]]; then
         tar czf "$archive" -C "$tmpdir" .
         rm -rf "$tmpdir"
 
-      else
+      elif [[ "$url" == http* ]]; then
         file="${url##*/}"
         dst="$pkgsrcdir/$file"
 
@@ -95,6 +109,17 @@ if [[ "$MODE" == "download-sources" ]]; then
         echo "==> [$pkgname] verifying $file"
         if [[ "$sum" != "SKIP" ]]; then
           echo "$sum  $dst" | sha256sum -c -
+        else
+          echo "--> SKIP checksum for $file"
+        fi
+      else
+        file="${url##*/}"
+        dirname=`dirname "$pb"`
+        cp "$dirname/$url" "$pkgsrcdir/$file"
+
+        echo "==> [$pkgname] verifying $file"
+        if [[ "$sum" != "SKIP" ]]; then
+          echo "$sum  $pkgsrcdir/$file" | sha256sum -c -
         else
           echo "--> SKIP checksum for $file"
         fi
@@ -150,14 +175,26 @@ elif [[ "$MODE" == "build" ]]; then
   echo "Building packages in order: ${targets[*]}"
 
   for p in "${targets[@]}"; do
+    # Check if item is in the PKGBLACKLIST
+    for blocked in "${PKGBLACKLIST[@]}"; do
+      if [[ "$p" == "$blocked" ]]; then
+        echo "Skipping blacklisted package: $p"
+        continue 2  # Skip this iteration of the outer loop
+      fi
+    done
+
     fp=`find "$PKGDIR" -name "$p.pkgbuild" -type f -print -quit`
     parse_pkgbuild "$fp" ""
-    echo "==> start $pkgname build"
-    export PSPDEV srcdir="$SRCDIR/$pkgname" pkgdir="$PSPDEV"
+
     # extract archives into build directory
     builddir=$(mktemp -d)
+    psrcdir="$SRCDIR/$pkgname"
+
+    echo "==> start $pkgname build"
+    export PSPDEV pkgdir="$PSPDEV"
+    export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     echo "[$pkgname] extracting sources"
-    for f in `find "$srcdir" -maxdepth 1 -type f`; do
+    for f in `find "$psrcdir" -maxdepth 1 -type f`; do
       case "$f" in
         *.tar.gz|*.tgz)   tar xzf "$f" -C "$builddir" ;; 
         *.tar.bz2)        tar xjf "$f" -C "$builddir" ;; 
@@ -167,6 +204,7 @@ elif [[ "$MODE" == "build" ]]; then
       esac
     done
     export srcdir="$builddir"
+    # export CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MAKEFLAGS CHOST
     echo "==> building $pkgname"
     type prepare &>/dev/null && (cd "$builddir" && prepare)
     type build   &>/dev/null && (cd "$builddir" && build)
