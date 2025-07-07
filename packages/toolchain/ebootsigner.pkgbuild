@@ -1,0 +1,31 @@
+pkgname=ebootsigner
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="ebootsigner for PSP"
+arch=('mips')
+url="https://github.com/pspdev/ebootsigner/"
+license=('AFL')
+groups=('pspdev-toolchain')
+depends=('pspsdk')
+makedepends=()
+optdepends=()
+source=("git+https://github.com/pspdev/ebootsigner.git#commit=17d6386f034ac922f540ca78200961761b23ecae")
+sha256sums=('SKIP')
+
+prepare() {
+    :;
+}
+
+build() {
+    PROC_NR=$(getconf _NPROCESSORS_ONLN)
+
+    cd $pkgname
+    make --quiet -j $PROC_NR clean
+    make --quiet -j $PROC_NR all
+}
+
+package() {
+    cd $pkgname
+    make --quiet install
+}
+

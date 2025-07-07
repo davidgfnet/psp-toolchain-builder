@@ -1,0 +1,26 @@
+pkgname=pspsdk
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="PSPSDK"
+arch=('mips')
+url="https://github.com/pspdev/pspsdk/"
+license=('BSD')
+groups=('pspdev-toolchain')
+depends=('gcc-phase2')
+makedepends=()
+optdepends=()
+source=("git+https://github.com/davidgfnet/pspsdk.git#commit=3cec824246e335aee24bcc50acd623d0c2341eb4")
+sha256sums=('SKIP')
+
+prepare() {
+    :;
+}
+
+build() {
+    cd $pkgname && ./build-and-install.sh
+}
+
+package() {
+    :;
+}
+

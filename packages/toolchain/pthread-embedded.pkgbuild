@@ -1,0 +1,35 @@
+pkgname=pthread-embedded
+pkgver=1.0
+pkgrel=1
+pkgdesc="pthread-embedded"
+arch=('mips')
+url="https://github.com/pspdev/pthread-embedded/"
+license=('MIT')
+groups=('pspdev-toolchain')
+depends=('binutils-gdb' 'gcc-phase1' 'newlib')
+makedepends=()
+optdepends=()
+source=("git+https://github.com/pspdev/pthread-embedded.git#commit=4f43d30a23e8ac6d0334aef64272b4052b5bb7c2")
+sha256sums=('SKIP')
+
+prepare() {
+    :;
+}
+
+build() {
+    PROC_NR=$(getconf _NPROCESSORS_ONLN)
+
+    cd $pkgname/platform/psp
+    make --quiet -j $PROC_NR clean
+    make --quiet -j $PROC_NR all
+}
+
+package() {
+    cd $pkgname/platform/psp
+    make --quiet install DESTDIR=$pkgdir/psp
+
+    # Copy license file
+    mkdir -p $pkgdir/psp/share/licenses/pthread-embedded
+    cp ../../COPYING.* $pkgdir/psp/share/licenses/pthread-embedded/
+}
+

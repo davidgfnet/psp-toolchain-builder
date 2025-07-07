@@ -1,0 +1,26 @@
+pkgname=toolchain
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Just a dummy package that depends on all toolchain packages"
+arch=('mips')
+url="https://github.com/pspdev/"
+license=('N/A')
+groups=('pspdev-toolchain')
+depends=('pspsdk' 'psp-cmake' 'psp-pkg-config' 'ebootsigner' 'psplinkusb')
+makedepends=()
+optdepends=()
+source=()
+sha256sums=()
+
+prepare() {
+    :;
+}
+
+build() {
+    :;
+}
+
+package() {
+    :;
+}
+

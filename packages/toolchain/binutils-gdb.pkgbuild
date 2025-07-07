@@ -1,0 +1,46 @@
+pkgname=binutils-gdb
+pkgver=2.37.0
+pkgrel=1
+pkgdesc="Binutils (MIPS Allegrex fork)"
+arch=('mips')
+url="https://github.com/pspdev/binutils-gdb/"
+license=('GPL')
+groups=('pspdev-toolchain')
+depends=()
+makedepends=()
+optdepends=()
+source=("git+https://github.com/pspdev/binutils-gdb.git#commit=a8b53fe2b5825fa86337623c743d21a19aeb0daf")
+sha256sums=('SKIP')
+
+prepare() {
+    mkdir -p ${pkgname}/build
+}
+
+build() {
+    TARGET=psp
+    # TODO allow python builds
+    WITH_PYTHON=no
+    TARG_XTRA_OPTS=""
+    PROC_NR=$(getconf _NPROCESSORS_ONLN)
+
+    cd ${pkgname}/build
+    ../configure \
+      --quiet \
+      --prefix="$PSPDEV" \
+      --target="$TARGET" \
+      --with-sysroot="$PSPDEV/$TARGET" \
+      --enable-plugins \
+      --disable-initfini-array \
+      --with-python="$WITH_PYTHON" \
+      --disable-werror \
+      $TARG_XTRA_OPTS
+
+    make --quiet -j $PROC_NR clean
+    make --quiet -j $PROC_NR all
+}
+
+package() {
+    cd ${pkgname}/build
+    make --quiet install-strip
+}
+

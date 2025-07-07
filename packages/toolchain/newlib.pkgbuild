@@ -1,0 +1,46 @@
+pkgname=newlib
+pkgver=4.5.0
+pkgrel=1
+pkgdesc="Newlib (PSP fork)"
+arch=('mips')
+url="https://github.com/pspdev/newlib/"
+license=('GPL')
+groups=('pspdev-toolchain')
+depends=('binutils-gdb' 'gcc-phase1')
+makedepends=()
+optdepends=()
+source=("git+https://github.com/pspdev/newlib.git#commit=9e0a073634ad73e8e088f2e071c55a9fe5d39709")
+sha256sums=('SKIP')
+
+prepare() {
+    mkdir -p $pkgname/build
+}
+
+build() {
+    TARGET=psp
+    PROC_NR=$(getconf _NPROCESSORS_ONLN)
+
+    cd $pkgname/build
+    ../configure \
+	--prefix="$PSPDEV" \
+	--target="$TARGET" \
+	--with-sysroot="$PSPDEV/$TARGET" \
+	--enable-newlib-retargetable-locking \
+	--enable-newlib-multithread \
+	--enable-newlib-io-c99-formats \
+ 	--enable-newlib-iconv \
+  	--enable-newlib-iconv-encodings=us_ascii,utf8,utf16,ucs_2_internal,ucs_4_internal,iso_8859_1
+
+    make --quiet -j $PROC_NR clean
+    make --quiet -j $PROC_NR all
+}
+
+package() {
+    cd $pkgname/build
+    make --quiet install-strip
+
+    # Copy license file
+    mkdir -p $pkgdir/psp/share/licenses/newlib
+    cp ../COPYING.NEWLIB $pkgdir/psp/share/licenses/newlib/
+}
+
