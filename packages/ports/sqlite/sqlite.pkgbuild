@@ -12,15 +12,18 @@ makedepends=()
 source=(
     "https://github.com/sqlite/sqlite/archive/refs/tags/version-3.7.4.tar.gz"
     "${pkgname}-${pkgver}-PSP.patch"
+    "gcc-15.patch"
 )
 sha256sums=(
     "5fdbe958102f6f9dc93f3fc2f9e61a327fe8067fed227cd63ae26ed210a2774a"
-    "SKIP"
+    "81bb454ea6f742e463f6eae5bde59f0345144c06ae41e765b76ebf4f089ae8d3"
+    "050cb02127e38a7f0622e49510e8e0525dcc75616ea8f3dcaeb057516986a13f"
 )
 
 prepare() {
     cd "${pkgname}-version-${pkgver}"
     patch -p1 < ../${pkgname}-${pkgver}-PSP.patch
+    patch -p1 < ../gcc-15.patch
     sed -i 's#@prefix@#${PSPDEV}/psp#' sqlite.pc.in sqlite3.pc.in
     sed -i 's#@exec_prefix@#${prefix}#' sqlite.pc.in sqlite3.pc.in
     sed -i 's#@libdir@#${prefix}/lib#' sqlite.pc.in sqlite3.pc.in

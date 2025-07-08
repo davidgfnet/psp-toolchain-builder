@@ -27,6 +27,9 @@ build-all:
 	@rm -f $(BIN_TARBALL)
 	@tar czf $(BIN_TARBALL) -C $(PSPDEV) .
 
+all:	build-all
+	@echo "make all complete"
+
 clean:
 	@rm -rf sources $(SRC_TARBALL) $(BIN_TARBALL)
 
