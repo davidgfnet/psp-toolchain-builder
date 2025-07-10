@@ -9,7 +9,7 @@ groups=('pspdev-toolchain')
 depends=('gcc-phase2')
 makedepends=()
 optdepends=()
-source=("git+https://github.com/davidgfnet/pspsdk.git#commit=3cec824246e335aee24bcc50acd623d0c2341eb4")
+source=("git+https://github.com/pspdev/pspsdk.git#commit=58c2b2a4a58ec1131657d53585961260070e2b7b")
 sha256sums=('SKIP')
 
 prepare() {
