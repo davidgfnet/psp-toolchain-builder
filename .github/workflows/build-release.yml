@@ -49,7 +49,7 @@ jobs:
       tarball: ${{ steps.find_tarball.outputs.tarball }}
     steps:
       - name: Install dependencies
-        run: sudo apt-get install curl libgmp-dev libmpfr-dev libmpc-dev bison xz-utils make tar ninja-build libisl-dev meson texinfo bzip2 doxygen libusb-dev
+        run: sudo apt-get install build-essential curl libgmp-dev libmpfr-dev libmpc-dev bison xz-utils make tar ninja-build libisl-dev meson texinfo bzip2 doxygen libusb-dev libreadline-dev gettext cmake autopoint
       - name: Fetch source tarball artifact
         uses: actions/download-artifact@v4
         with:
