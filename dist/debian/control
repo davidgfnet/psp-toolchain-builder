@@ -1,0 +1,12 @@
+Source: pspdev
+Maintainer: David Guillen Fandos <david@davidgf.net>
+Section: misc
+Priority: optional
+Standards-Version: 1.0.0
+Build-Depends: debhelper-compat (= 13), libgmp-dev, libmpfr-dev, libmpc-dev, bison, xz-utils, make, tar, ninja-build, libisl-dev, meson, texinfo, bzip2, doxygen, flex, libusb-dev, libreadline-dev, gettext, cmake, pkg-config, autopoint, zlib1g-dev, unzip, tcl
+
+Package: pspdev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: PSP SDK and toolchain.
+

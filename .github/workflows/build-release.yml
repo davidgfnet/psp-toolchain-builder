@@ -74,7 +74,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
         with:
-          name: pspdev-ubuntu-22.04-${{ steps.slug.outputs.sha8 }}
+          name: pspdev-ubuntu-22.04-${{ needs.build-source-tarball.outputs.sha8 }}
           path: ${{ steps.find_tarball.outputs.tarball }}
 
   # Create a new release and attach the previously built assets.

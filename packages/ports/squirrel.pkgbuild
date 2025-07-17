@@ -28,5 +28,9 @@ package() {
 
     mkdir -m 755 -p "$pkgdir/psp/share/licenses/$pkgname"
     install -m 644 COPYRIGHT "$pkgdir/psp/share/licenses/$pkgname"
+
+    # Delete unnecessary ELF binaries (can't disable them via cmake unfortunately)
+    rm -f "$pkgdir/psp/bin/sq"
+    rm -f "$pkgdir/psp/bin/sq_static"
 }
 

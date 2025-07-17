@@ -17,7 +17,7 @@ build-sources:
 	@./builder.sh download-sources
 	@sed -E "s/^(PSPDEV_GITSHA[[:space:]]*:=).*/\1 $(PSPDEV_GITSHA)/" Makefile > .makefile
 	@tar czf $(SRC_TARBALL) --transform='s|^\.makefile$$|Makefile|' \
-	  .makefile builder.sh packages sources
+	  .makefile builder.sh packages sources dist
 	@rm -f .makefile
 
 build-all:
@@ -27,9 +27,17 @@ build-all:
 	@rm -f $(BIN_TARBALL)
 	@tar czf $(BIN_TARBALL) -C $(PSPDEV) .
 
-all:	build-all
-	@echo "make all complete"
+all:
+	mkdir build
+	$(MAKE) build-all PSPDEV=$$(realpath build) PATH=$$PATH:$$(realpath build)/bin
+
+install:
+	mkdir -p $(DESTDIR)/opt/
+	cp -r build $(DESTDIR)/opt/pspdev
 
 clean:
-	@rm -rf sources $(SRC_TARBALL) $(BIN_TARBALL)
+	@rm -rf $(SRC_TARBALL) $(BIN_TARBALL)
+
+sources-clean:
+	@rm -rf sources
 

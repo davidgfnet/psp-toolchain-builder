@@ -15,9 +15,8 @@ BuildRequires:	autoconf automake pkgconf openssl-devel texinfo bison flex libarc
 BuildRequires:	make ncurses-devel wget bc gmp-devel mpfr-devel libmpc-devel
 BuildRequires:  gcc gcc-c++ git gpgme-devel python3 python3-pip fakeroot bsdtar
 BuildRequires:  zlib-devel make cmake libtool gettext gettext-devel doxygen tcl readline-devel
-BuildRequires:  zlib bzip2 xz
-Requires: glibc
-Requires: libgcc
+BuildRequires:  zlib bzip2 xz libzstd-devel
+Requires:       glibc libgcc mpfr gmp libmpc libzstd zlib ncurses
 AutoReqProv: no
 
 BuildRequires: libusb-compat-0.1-devel
