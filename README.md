@@ -50,3 +50,14 @@ dependencies and copying them into a slightly different directory structure.
 In general we just have a single file for each package, unless it has some
 local files (ie. patches), for which we create a subdir.
 
+Supported builds
+----------------
+
+Added support for Fedora (.spec) and Ubuntu (debian/) packaging.
+For now I maintain these builds:
+
+ - Fedora (copr): https://copr.fedorainfracloud.org/coprs/davidgf/pspdev/
+   `#> dnf copr enable davidgf/pspdev`
+ - Ubuntu (launchpad): https://launchpad.net/~david-davidgf/+archive/ubuntu/pspdev
+   `#> add-apt-repository ppa:david-davidgf/pspdev`
+
