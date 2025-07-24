@@ -101,12 +101,12 @@ jobs:
       - name: Fetch source assets
         uses: actions/download-artifact@v4
         with:
-          name: pspdev-source-${{ steps.slug.outputs.sha8 }}
+          name: pspdev-source-${{ needs.build-source-tarball.outputs.sha8 }}
           path: ./src
       - name: Fetch binary assets
         uses: actions/download-artifact@v4
         with:
-          name: pspdev-ubuntu-22.04-${{ steps.slug.outputs.sha8 }}
+          name: pspdev-ubuntu-22.04-${{ needs.build-source-tarball.outputs.sha8 }}
           path: ./bin-ubuntu-24.04
 
       - name: Upload Release Asset (source)
